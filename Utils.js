@@ -3,6 +3,10 @@ const _IntEntries = (values) => {
     // 1. Create an array by splitting commas from input
     // 2. Convert all elements from the array to Numbers
     // 3. Return an array containing ONLY numbers and numbers > 0
+    if (!values) {
+        return [];
+    }
+    
     return values.split(",").map(Number).filter(num => (!isNaN(num) && num > 0))
 }
 

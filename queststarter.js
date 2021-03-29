@@ -5,6 +5,11 @@ const { _IntEntries } = require('./Utils');
 
 const generateData = () => {
     const questList = _IntEntries(process.argv.splice(2)[0]);
+    if (questList.length === 0) {
+        console.log('Invalid input arguments');
+        return;
+    }
+
     const sqlDir = './sqls';
     const promises = [];
     
