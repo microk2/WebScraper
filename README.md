@@ -7,7 +7,7 @@ Maybe it works better in other programming languages, who knows /shrug
 
 ## How to use it
 First of all you have to open the project folder with a CLI and write:
-```npm init``` to download all dependencies
+```npm install``` to download all dependencies
 
 * Get quest starter/ender for WoW quests:\
 With any CLI go to the project folder and write:
