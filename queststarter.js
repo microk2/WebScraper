@@ -3,54 +3,58 @@ const fs = require('fs');
 const { _IntEntries } = require('./Utils');
 const axios = require('axios');
 
+// JS will always return a Promise if the function is async
 const getDataForQuestId = async (questId) => {
-    const url = `https://www.wowhead.com/quest=${questId}`;
-    const axiosResponse = await axios.get(url, {timeout: 0})
-    const $ = cheerio.load(axiosResponse.data);
-
-    const scriptData = $('script:not([src])'); // A list with all <script> tags from response HTML
-    const questName = $('.heading-size-1').text();
-    const entities = []; // Stores quest starter/ender id and type (creture/object)
-    const index = 21; // This is the index of <script> HTML tag where the info is stored for start/end npc/object
-    const scriptText = $(scriptData[index].children).text();
-
-    // Returns an array of the text from JS script that includes Start:/End:/npc=/object=
-    const scriptTextFormatted = scriptText.split(" ").filter((str) => str.includes('npc=') || str.includes('object=') || str.includes('Start:') || str.includes('End:'));
-
-    let isQuestStarter = true;
-    for (const line of scriptTextFormatted) {
-        let entityIsObject = false;
-
-        if (line.includes('Start:'))
-            continue;
-
-        if (line.includes('End:')) {
-            isQuestStarter = false;
-            continue;
+    try {
+        const url = `https://www.wowhead.com/quest=${questId}`;
+        const axiosResponse = await axios.get(url)
+        const $ = cheerio.load(axiosResponse.data);
+        const scriptData = $('script:not([src])'); // A list with all <script> tags from response HTML
+        const questName = $('.heading-size-1').text();
+        const entities = []; // Stores quest starter/ender id and type (creture/object)
+        const index = 21; // This is the index of <script> HTML tag where the info is stored for start/end npc/object
+        const scriptText = $(scriptData[index].children).text();
+        // Returns an array of the text from JS script that includes Start:/End:/npc=/object=
+        const scriptTextFormatted = scriptText.split(" ").filter((str) => str.includes('npc=') || str.includes('object=') || str.includes('Start:') || str.includes('End:'));
+    
+        let isQuestStarter = true;
+        for (const line of scriptTextFormatted) {
+            let entityIsObject = false;
+    
+            if (line.includes('Start:'))
+                continue;
+    
+            if (line.includes('End:')) {
+                isQuestStarter = false;
+                continue;
+            }
+    
+            if (line.includes('object=')) {
+                entityIsObject = true;
+            }
+    
+            // We extract only the numbers from the string
+            const entityId = line.replace(/\D/g, '');
+            entities.push({
+                entityId: entityId,
+                isQuestStarter: isQuestStarter,
+                isObject: entityIsObject
+            })
         }
-
-        if (line.includes('object=')) {
-            entityIsObject = true;
-        }
-
-        // We extract only the numbers from the string
-        const entityId = line.replace(/\D/g, '');
-        entities.push({
-            entityId: entityId,
-            isQuestStarter: isQuestStarter,
-            isObject: entityIsObject
-        })
-    }
-
-    console.log(`[${questId}] - ${questName}`)
-    return {
-        questId: questId,
-        questName: questName,
-        entities: entities
+    
+        console.log(`[${questId}] - ${questName}`);
+        return {
+            questId: questId,
+            questName: questName,
+            entities: entities
+        };
+    }  
+    catch (err) {
+        console.log(err)
     }
 }
 
-const generateData = () => {
+const generateData = async () => {
     const questList = _IntEntries(process.argv.splice(2)[0]);
     if (questList.length === 0) {
         console.log('Invalid input arguments');
@@ -77,15 +81,25 @@ const generateData = () => {
 
     console.log(`\nGetting data from WoWHead for your quests...`)
     for (const questId of questList) {
-        promises.push(getDataForQuestId(questId));
+        promises.push(await getDataForQuestId(questId));
     }
 
+    // I don't think we need Promise.allSettled anymore since the promises.push uses await
     Promise.allSettled(promises).then((result) => {
-        let failed = 0;
+        let failedCount = 0;
+        let noDataCount = 0;
+
+        console.log("\nWriting data to SQL file...");
         for (const data of result) {
             if (data.status !== 'fulfilled') {
-                console.log(`Fail: ${data.reason.config.url}`)
-                failed++;
+                console.log(`Fail: ${data.reason}`);
+                failedCount++;
+                continue;
+            }
+
+            if (data.value.entities.length === 0) {
+                console.log(`Quest [${data.value.questId}] - ${data.value.questName} -> no quest starter/ender found.`);
+                noDataCount++;
                 continue;
             }
 
@@ -97,14 +111,20 @@ const generateData = () => {
             }
         }
 
-        if (failed > 0) {
-            console.log(`\n\nFailed generating SQL for ${failed} quests.`);
+        if (failedCount > 0) {
+            console.log(`\n\nFailed generating SQL for ${failedCount} quests.`);
         }
 
         const _EndDate = new Date();            
-        console.log(`\nGenerated quest starter/ender for ${questList.length - failed} quest(s).`);
-        console.log(`Time spent: ${(_EndDate.getTime() - _Date.getTime()) / 1000} seconds.`);
-        console.log(`Done. Check file ${filePath}`);
+        console.log(`\nTime spent: ${(_EndDate.getTime() - _Date.getTime()) / 1000} seconds.`);
+
+        if (fs.existsSync(filePath)) {
+            console.log(`Generated quest starter/ender for ${questList.length - failedCount - noDataCount} quest(s).`);
+            console.log(`Done. Check file ${filePath}`);
+        }
+        else {
+            console.log('No file was created because there is nothing to write in it.')
+        }
     })
 }
 generateData();
