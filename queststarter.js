@@ -12,12 +12,20 @@ const getDataForQuestId = async (questId) => {
         const scriptData = $('script:not([src])'); // A list with all <script> tags from response HTML
         const questName = $('.heading-size-1').text();
         const entities = []; // Stores quest starter/ender id and type (creture/object)
-        const index = 21; // This is the index of <script> HTML tag where the info is stored for start/end npc/object
+        let index = 0; // This is the index of <script> HTML tag where the info is stored for start/end npc/object
+        $(scriptData).each((i, el) => {
+            if ($(el.children).text().includes('Start:') || $(el.children).text().includes('End:')) {
+                index = i;
+                return false; // Break the loop
+            }
+        })
+
         const scriptText = $(scriptData[index].children).text();
+
         // Returns an array of the text from JS script that includes Start:/End:/npc=/object=
         const scriptTextFormatted = scriptText.split(" ").filter((str) => str.includes('npc=') || str.includes('object=') || str.includes('Start:') || str.includes('End:'));
-    
-        let isQuestStarter = true;
+
+        let isQuestStarter = true;        
         for (const line of scriptTextFormatted) {
             let entityIsObject = false;
     
