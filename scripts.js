@@ -22,7 +22,7 @@ module.exports = {
             return new Error("isEmpty: The input value is null");
         }
     
-        const type = Object.prototype.toString.call(item).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+        const type = getTypeOf(item);
         if (type === 'array') {
             return item.length === 0;
         }
