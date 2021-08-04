@@ -77,7 +77,7 @@ const generateData = async () => {
         }
         
         const db = require('./database.js');
-        const data = await db.getDataFromDB("SELECT QuestId FROM questlinexquest WHERE QuestLineId IN (?)", questLines);
+        const data = await db.getDataFromDB("SELECT QuestId FROM questlinexquest WHERE QuestLineId IN (?) ORDER BY questlineid, orderindex ASC", questLines);
 
         for (const itr of data) {
             questList.push(itr.QuestId)
