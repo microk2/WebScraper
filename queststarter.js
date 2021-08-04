@@ -1,7 +1,9 @@
 const cheerio = require('cheerio');
 const fs = require('fs');
-const { _IntEntries } = require('./Utils');
 const axios = require('axios');
+const Scripts = require('./scripts');
+const Settings = require('./settings.json');
+const CommandLine = require('./classes/CommandLine');
 
 // JS will always return a Promise if the function is async
 const getDataForQuestId = async (questId) => {
@@ -63,23 +65,41 @@ const getDataForQuestId = async (questId) => {
 }
 
 const generateData = async () => {
-    const questList = _IntEntries(process.argv.splice(2)[0]);
-    if (questList.length === 0) {
+    const cmd = new CommandLine(process.argv);
+    let questList = [];
+
+    if (cmd.hasOption("-ql")) {
+        const questLines = Scripts.intEntries(cmd.getValuesForOption("-ql"));
+        
+        if (Scripts.isEmpty(questLines)) {
+            console.log("No questline ids found after -ql");
+            return;
+        }
+        
+        const db = require('./database.js');
+        const data = await db.getDataFromDB("SELECT QuestId FROM questlinexquest WHERE QuestLineId IN (?)", questLines);
+
+        for (const itr of data) {
+            questList.push(itr.QuestId)
+        }
+
+        db.db.end();
+    }
+    
+    if (Scripts.isEmpty(cmd.getOptions())) {
+        questList = Scripts.intEntries(cmd.getInput());
+    }
+
+    if (Scripts.isEmpty(questList)) {
         console.log('Invalid input arguments');
         return;
     }
 
-    const sqlDir = './sqls';
     const promises = [];
 
     const _Date = new Date();
-    const yearMonthDay = `${_Date.getFullYear()}${_Date.getMonth() + 1}${_Date.getDate()}`;
-    
-    // Not really an UNIX timestamp but we don't need that
-    const hourMinutesSeconds = `${_Date.getHours()}${_Date.getMinutes()}${_Date.getSeconds()}`;
-
-    // Create file name
-    const fileName = `queststarter_${yearMonthDay}_${hourMinutesSeconds}.sql`;
+    const sqlDir = Settings.sqlDir;
+    const fileName = Scripts.generateFileName("queststarter");
     const filePath = `${sqlDir}/${fileName}`;
 
     if (!fs.existsSync(sqlDir)) {
@@ -91,7 +111,7 @@ const generateData = async () => {
     for (const questId of questList) {
         promises.push(await getDataForQuestId(questId));
     }
-
+    
     // I don't think we need Promise.allSettled anymore since the promises.push uses await
     Promise.allSettled(promises).then((result) => {
         let failedCount = 0;
@@ -105,8 +125,8 @@ const generateData = async () => {
                 continue;
             }
 
-            if (data.value.entities.length === 0) {
-                console.log(`Quest [${data.value.questId}] - ${data.value.questName} -> no quest starter/ender found.`);
+            if (Scripts.isEmpty(data.value.entities)) {
+                console.log(`Quest [${data.value.questId}] - ${data.value.questName} -> no quest starter & ender found. Skipped`);
                 noDataCount++;
                 continue;
             }
@@ -135,4 +155,5 @@ const generateData = async () => {
         }
     })
 }
+
 generateData();
