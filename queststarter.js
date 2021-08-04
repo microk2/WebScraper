@@ -90,6 +90,8 @@ const generateData = async () => {
         questList = Scripts.intEntries(cmd.getInput());
     }
 
+    questList = Scripts.removeDuplicates(questList);
+    
     if (Scripts.isEmpty(questList)) {
         console.log('Invalid input arguments');
         return;
