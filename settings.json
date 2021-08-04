@@ -1,0 +1,9 @@
+{
+    "sqlDir": "./sqls",
+    "database": {
+        "host": "localhost",
+        "user": "root",
+        "password": "root",
+        "database": "sl_905_db2"
+    }
+}
