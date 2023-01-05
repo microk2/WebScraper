@@ -1,17 +1,25 @@
 {
-  "name": "WebCrawler",
+  "name": "WebScraper",
   "version": "1.0.0",
   "description": "",
-  "main": "crawler.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "main": "node ./build/main.js",
+    "queststarter": "node ./build/scripts/questGen.js --"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
-    "cheerio": "^1.0.0-rc.10",
+    "axios": "^1.2.2",
+    "cheerio": "^1.0.0-rc.12",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.31",
+    "@types/glob": "^7.2.0",
+    "@types/mysql": "^2.15.21",
+    "@types/node": "^16.11.10",
+    "typescript": "^4.9.4"
   }
 }

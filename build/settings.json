@@ -4,6 +4,6 @@
         "host": "localhost",
         "user": "root",
         "password": "root",
-        "database": "sl_905_db2"
+        "db2": "df_db2"
     }
 }
