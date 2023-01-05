@@ -13,7 +13,7 @@ const cheerio: CheerioAPI = require("cheerio").default;
   await db.connect();
 
   const fileName = generateFileName("queststarter");
-  const filePath = `${FileManager.buildDirPath}/sqls/${fileName}`;
+  const filePath = `${FileManager.projectDirPath}/sqls/${fileName}`;
   const input: List<string> = new List<string>(process.argv.splice(2));
   const QuestlineObject: { id: number; name?: string; questIds: number[] }[] =
     [];
