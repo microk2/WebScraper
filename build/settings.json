@@ -1,9 +1,0 @@
-{
-    "sqlDir": "./sqls",
-    "database": {
-        "host": "localhost",
-        "user": "root",
-        "password": "root",
-        "db2": "df_db2"
-    }
-}
