@@ -134,9 +134,14 @@ const cheerio: CheerioAPI = require("cheerio").default;
     );
 
     for (const questObj of questIdXName) {
+      const islast: boolean =
+        questIdXName.indexOf(questObj) === questIdXName.length - 1;
+
       fs.appendFileSync(
         filePath,
-        `(${questObj.id}, 0, 0, 0, 0), -- ${questObj.name}\n`
+        `(${questObj.id}, 0, 0, 0, 0)${islast ? ";" : ","} -- ${
+          questObj.name
+        }\n`
       );
     }
 
