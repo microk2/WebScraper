@@ -11,6 +11,10 @@ export default class FileManager {
     return `${FileManager.projectDirPath}/build`;
   }
 
+  public static get sqlDirPath(): string {
+    return `${FileManager.projectDirPath}/sql`;
+  }
+
   public static get isEnvFileCreated(): boolean {
     return this.isValidPath("/.env");
   }

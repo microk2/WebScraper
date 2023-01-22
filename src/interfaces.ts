@@ -1,3 +1,5 @@
+import List from "./classes/List";
+
 export interface Questline {
   ROW_ID: number;
   Name: string;
@@ -17,4 +19,20 @@ export interface QuestlineXQuest {
 export interface QuestTemplate {
   ID: number;
   LogTitle: string;
+}
+
+export interface QuestlineObject {
+  id: number;
+  name?: string;
+  questIds: List<number>;
+}
+
+export interface ParsedQuestObject {
+  questId: number;
+  questName: string;
+  entities: {
+    entityId: number;
+    isQuestStarter: boolean;
+    isObject: boolean;
+  }[];
 }
