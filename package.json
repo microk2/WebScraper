@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "main": "node ./build/main.js",
-    "queststarter": "node ./build/scripts/questGen.js --"
+    "questline": "node ./build/scripts/questGen.js -- -ql",
+    "quest": "node ./build/scripts/questGen.js"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,7 @@
     "@types/cheerio": "^0.22.31",
     "@types/glob": "^7.2.0",
     "@types/mysql": "^2.15.21",
-    "@types/node": "^16.11.10",
+    "@types/node": "^16.18.11",
     "typescript": "^4.9.4"
   }
 }
