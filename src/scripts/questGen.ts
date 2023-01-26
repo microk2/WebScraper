@@ -140,6 +140,22 @@ const writeToFile = async (
       }\n`
     );
   }
+
+  fs.appendFileSync(filePath, `\n/*\n\t============ PHASE ============\n*/`);
+
+  fs.appendFileSync(
+    filePath,
+    `\n/*\n\t============  PHASE END ============\n*/`
+  );
+
+  for (const qdata of data) {
+    fs.appendFileSync(
+      filePath,
+      `\n/*\n\tQuest: ${qdata.questName} (${qdata.questId})\n*/\n`
+    );
+  }
+
+  fs.appendFileSync(filePath, `\n/*\n\t============ UPDATES ============\n*/`);
 };
 
 (async () => {
