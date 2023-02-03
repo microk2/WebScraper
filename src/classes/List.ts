@@ -12,9 +12,7 @@ export default class List<T> extends Array<T> {
   }
 
   public sortList(ascending: boolean): List<T> {
-    return new List<T>([
-      ...this.sort((a, b) => (ascending ? (a > b ? 1 : -1) : a > b ? -1 : 1)),
-    ]);
+    return new List<T>([...this.sort((a, b) => (ascending ? (a > b ? 1 : -1) : a > b ? -1 : 1))]);
   }
 
   public clearList(): void {

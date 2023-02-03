@@ -36,3 +36,20 @@ export interface ParsedQuestObject {
     isObject: boolean;
   }[];
 }
+
+export interface ParsedDataType {
+  type: ParsedQuestObject[];
+}
+
+export interface CreatureTextData {
+  entry: number;
+  name: string;
+  title: string;
+  data: {
+    id: number;
+    text: string;
+    type: number;
+    soundId: number;
+    broadcastId: number;
+  }[];
+}

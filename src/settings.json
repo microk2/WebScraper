@@ -4,6 +4,7 @@
     "host": "localhost",
     "user": "root",
     "password": "root",
-    "db2": "1002_db2"
+    "db2": "df_db2",
+    "hotfix": "df_hotfix",    
   }
 }

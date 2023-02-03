@@ -6,7 +6,8 @@
   "scripts": {
     "main": "node ./build/main.js",
     "questline": "node ./build/scripts/questGen.js -- -ql",
-    "quest": "node ./build/scripts/questGen.js"
+    "quest": "node ./build/scripts/questGen.js",
+    "creature": "node ./build/scripts/creatureGen.js"
   },
   "keywords": [],
   "author": "",

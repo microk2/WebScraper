@@ -26,17 +26,17 @@ export default class Database {
     return this.runQuery<Questline>(stmt, id);
   }
 
-  public async getQuestlineXQuest(
-    questlineId: number | number[]
-  ): Promise<QuestlineXQuest[]> {
+  public async getQuestlineXQuest(questlineId: number | number[]): Promise<QuestlineXQuest[]> {
     const stmt = `SELECT QuestlineId, QuestId, OrderIndex FROM ${settings.database.db2}.questlinexquest WHERE QuestLineId IN (?) ORDER BY QuestlineId, OrderIndex ASC;`;
     return this.runQuery<QuestlineXQuest>(stmt, questlineId);
   }
 
-  public runQuery<T>(
-    stmt: string,
-    values: number | string | number[] | string[]
-  ): Promise<T[]> {
+  public async getBroadcastIdForSoundId(soundId: number): Promise<number[]> {
+    const stmt = `SELECT ROW_ID FROM ${settings.database.hotfix}.broadcasttext WHERE (SoundKitId_0 = ${soundId} OR SoundKitId_1 = ${soundId}) ORDER BY ROW_ID DESC LIMIT 1;`;
+    return this.runQuery<number>(stmt, [soundId]);
+  }
+
+  public runQuery<T>(stmt: string, values: number | string | number[] | string[]): Promise<T[]> {
     return new Promise((res, rej) => {
       Database.connection.query(stmt, [values], (err, data) => {
         if (err) rej(err);
